@@ -17,18 +17,18 @@ class Student:
         
         Takes in 0-based indices, and creates an object with 1-based indices and zero-based indices."""
 
-        self.zero_based_index = index
-        self.index = index + 1
+        self.index = index
         self.grade = grade
-        self.zero_based_gr_index = gr_index
-        self.gr_index = gr_index + 1
+        self.gr_index = gr_index
 
 def population_data_from_csv(path: str) -> list[Student]:
     _population = []
     with open(path, "r") as _file:
         _reader = csv.reader(_file)
         for i, row in enumerate(_reader):
-            _population.append(Student(i, int(row[1]), int(row[2])))
+            if i == 0:
+                continue    
+            _population.append(Student(int(row[0]), int(row[1]), int(row[2])))
     for student in _population:
         if student.grade == 8:
             _population.remove(student)
@@ -41,28 +41,38 @@ def grade_populations_from_population(population: list[Student]) -> list[list[St
     return _populations
 
 def generate_samples(grade_populations: list[list[Student]]) -> list[list[Student]]:
-    _samples = []
+    _samples: list[list[Student]] = []
     for grade in grade_populations:
-        _samples.append(rd.sample(grade, 30))
+        _samples.append(sorted(rd.sample(grade, 30), key=lambda s: s.index))
+    return _samples
 
-def check_samples(samples: list[list[int]]): # redo once the new system is set up
-    for i in range(len(samples)):
-        for j in range(len(samples[i])):
-            _gr_c = lambda x: x + 9
-            _gr = _gr_c(i)
+def check_samples(samples: list[list[Student]], grade_populations: list[list[Student]]) -> list[list[Student]]:
+    _samples = samples
+    for sample in _samples:
+        for i, student in enumerate(sample):
+            _student = student
             _br = False
-            while (not _br):
-                _res = input(f"{str(_gr).zfill(2)}-{samples[i][j]} (j+1: {j+1}) ok? (y/n) ")
-                if _res.lower() == "n":
-                    samples[i][j] = rd.randint(1, N_ALL[i])
-                elif _res.lower() == "y":
+            while not _br:
+                _br = False
+                _res = input(f"{str(_student.grade).zfill(2)}-{str(_student.gr_index).zfill(3)}: {_student.index} ok? (y/n) ")
+                _res = _res.lower().strip()
+                if _res == "y":
                     _br = True
-                elif _res.lower() != "n" and _res.lower() != "y":
-                    print("Invalid input")
+                elif _res == "n":
+                    _samples[_samples.index(sample)][i] = rd.choice(grade_populations[_samples.index(sample)])
+                    _student = _samples[_samples.index(sample)][i]
+                else:
+                    print("Invalid input.")
+    return _samples
 
 if __name__ == "__main__":
-    samples = generate_samples(N_ALL, 30)
-    check_samples(samples)
+    population_data = population_data_from_csv("../../data/students/population.csv")
+    grade_populations = grade_populations_from_population(population_data)
+    samples = generate_samples(grade_populations)
+    check_samples(samples, grade_populations)
+
     with open("../../data/samples/samples.csv", "w") as f:
         writer = csv.writer(f)
         writer.writerows(samples)
+    
+    print("Samples saved to data/samples/samples.csv.")
