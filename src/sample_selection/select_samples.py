@@ -1,5 +1,6 @@
 import random as rd
 import csv
+import sys
 
 # total numbers of students in each grade level
 N_09 = 337
@@ -65,14 +66,26 @@ def check_samples(samples: list[list[Student]], grade_populations: list[list[Stu
                     print("Invalid input.")
     return _samples
 
+index_lists_from_samples: list[list[int]] = lambda samples_checked: [list(map(lambda s: s.index, sample)) for sample in samples_checked]
+
 if __name__ == "__main__":
     population_data = population_data_from_csv("../../data/students/population.csv")
     grade_populations = grade_populations_from_population(population_data)
     samples = generate_samples(grade_populations)
-    check_samples(samples, grade_populations)
+    if len(sys.argv) == 1:
+        print("usage: python select_samples.py <check|auto>")
+        exit(-1)
+    elif sys.argv[1] == "check" or sys.argv[1] == "c":
+        samples_checked = check_samples(samples, grade_populations)
+        indices = index_lists_from_samples(samples_checked)
+    elif sys.argv[1] == "auto" or sys.argv[1] == "a":
+        indices = index_lists_from_samples(samples)
+    else:
+        print("Invalid input.")
+        exit(-1)
 
     with open("../../data/samples/samples.csv", "w") as f:
         writer = csv.writer(f)
-        writer.writerows(samples)
+        writer.writerows(indices)
     
     print("Samples saved to data/samples/samples.csv.")
