@@ -11,13 +11,7 @@ N_ALL = [N_09, N_10, N_11, N_12]
 N_TOTAL = sum(N_ALL)
 
 class Student:
-    """Student class."""
-
     def __init__(self, index: int, grade: int, gr_index: int):
-        """Student constructor.
-        
-        Takes in 0-based indices, and creates an object with 1-based indices and zero-based indices."""
-
         self.index = index
         self.grade = grade
         self.gr_index = gr_index
