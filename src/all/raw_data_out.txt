@@ -6,7 +6,7 @@
 4     235        Robert Cockburn      3            9
 5     249          Cecelia Combs      4            9
 6     311            Tyler Dodge      1            9
-7     436         Garrrett Goade    N/A            9
+7     436          Garrett Goade    N/A            9
 8     447          Kelsey Goodro    N/A            9
 9     466           Elsa Griffin      8            9
 10    476              Micah Guy      7            9
